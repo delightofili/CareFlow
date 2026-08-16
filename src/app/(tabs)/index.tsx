@@ -1,4 +1,4 @@
-import ProgressCard from "@/components/ProgressCard";
+import ProgressCard from "@/components/home/ProgressCard";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
