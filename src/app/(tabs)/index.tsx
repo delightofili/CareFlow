@@ -1,6 +1,10 @@
+import HealthMetric from "@/components/home/HealthMetric";
 import ProgressCard from "@/components/home/ProgressCard";
 import AppCard from "@/components/ui/AppCard";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { spacing } from "@/constants/spacing";
+
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   return (
@@ -10,7 +14,17 @@ export default function HomeScreen() {
 
         <Text style={styles.subtitle}>Here's how you're doing today.</Text>
 
-        <ProgressCard percentage={71} completed={4} total={6} />
+        <ProgressCard percentage={72} completed={4} total={6} />
+
+        <View style={styles.metrics}>
+          <HealthMetric icon="heart" unit="bpm" value="72" label="Heart rate" />
+          <HealthMetric
+            icon="water"
+            unit="glasses"
+            value="4 / 8"
+            label="Water"
+          />
+        </View>
 
         <Text style={styles.sectionTitle}>Upcoming</Text>
 
@@ -78,5 +92,11 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: 28,
     color: "#777777",
+  },
+  metrics: {
+    flexDirection: "row",
+    gap: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
 });
