@@ -1,15 +1,16 @@
 import ProgressCard from "@/components/home/ProgressCard";
+import AppCard from "@/components/ui/AppCard";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <AppCard>
         <Text style={styles.greeting}>Good morning 👋</Text>
 
         <Text style={styles.subtitle}>Here's how you're doing today.</Text>
 
-        <ProgressCard percentage={72} completed={4} total={6} />
+        <ProgressCard percentage={71} completed={4} total={6} />
 
         <Text style={styles.sectionTitle}>Upcoming</Text>
 
@@ -22,7 +23,7 @@ export default function HomeScreen() {
 
           <Text style={styles.arrow}>›</Text>
         </View>
-      </View>
+      </AppCard>
     </SafeAreaView>
   );
 }
@@ -31,12 +32,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-  },
-
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 24,
   },
 
   greeting: {
