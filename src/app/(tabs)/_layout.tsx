@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/theme";
 import { Tabs } from "expo-router";
 import { CheckCircle2, Clock, Home, User } from "lucide-react-native/";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,19 +9,20 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#635BFF",
-        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textMuted,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: "600",
         },
         tabBarStyle: {
-          height: 72 + insets.bottom,
+          height: 70 + insets.bottom,
           paddingTop: 8,
           paddingBottom: insets.bottom + 10,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
           elevation: 0,
-          backgroundColor: "#FFFFFF",
+          backgroundColor: Colors.white,
+          borderTopColor: Colors.border,
         },
       }}
     >

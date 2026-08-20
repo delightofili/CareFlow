@@ -8,74 +8,32 @@ import "@/global.css";
 import { Platform } from "react-native";
 
 export const Colors = {
-  light: {
-    text: "#000000",
-    background: "#ffffff",
-    backgroundElement: "#F0F0F3",
-    backgroundSelected: "#E0E1E6",
-    textSecondary: "#60646C",
-  },
-  dark: {
-    text: "#ffffff",
-    background: "#000000",
-    backgroundElement: "#212225",
-    backgroundSelected: "#2E3135",
-    textSecondary: "#B0B4BA",
-  },
   background: "#FFFFFF",
-  surface: "#F7F7FA",
-  surfaceMuted: "#F1F1F5",
+  surface: "#F9F9F9",
+  surfaceSecondary: "#F3F3F3",
 
-  primary: "#635BFF",
-  primarySoft: "#EEECFF",
+  primary: "#E53935",
+  primaryDark: "#C62828",
+  primarySoft: "#FDECEC",
 
-  text: "#111827",
-  textSecondary: "#6B7280",
-  textMuted: "#9CA3AF",
+  text: "#171717",
+  textSecondary: "#666666",
+  textMuted: "#9A9A9A",
 
-  success: "#22C55E",
-  warning: "#F59E0B",
-  danger: "#EF4444",
+  border: "#EAEAEA",
 
-  border: "#E5E7EB",
-} as const;
+  success: "#22A06B",
+  warning: "#D98A00",
+  danger: "#E53935",
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+  white: "#FFFFFF",
+  black: "#000000",
+};
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: "ui-monospace",
-  },
-  default: {
-    sans: "normal",
-    serif: "serif",
-    rounded: "normal",
-    mono: "monospace",
-  },
-  web: {
-    sans: "var(--font-display)",
-    serif: "var(--font-serif)",
-    rounded: "var(--font-rounded)",
-    mono: "var(--font-mono)",
-  },
-});
-
-export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
-} as const;
-
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const Typography = {
+  heading: 30,
+  title: 20,
+  body: 16,
+  small: 14,
+  caption: 12,
+};

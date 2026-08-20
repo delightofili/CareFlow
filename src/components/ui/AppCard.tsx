@@ -1,10 +1,9 @@
-import { spacing } from "@/constants/spacing";
 import { Colors } from "@/constants/theme";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 interface AppCardProps {
   children: React.ReactNode;
-  style?: object;
+  style?: ViewStyle;
 }
 
 export default function AppCard({ children, style }: AppCardProps) {
@@ -13,8 +12,10 @@ export default function AppCard({ children, style }: AppCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: spacing.md,
-    padding: spacing.lg,
+    backgroundColor: Colors.white,
+    borderRadius: 22,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
 });

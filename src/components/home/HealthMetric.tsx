@@ -1,24 +1,28 @@
-import { spacing } from "@/constants/spacing";
 import { Colors } from "@/constants/theme";
+import { spacing } from "@/constants/spacing";
 import { Droplet, Heart, LucideIcon } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const Icon_Map: Record<
+const ICON_MAP: Record<
   string,
   {
-    component:
-      | LucideIcon
-      | React.ComponentType<{ size?: number; color?: string }>;
+    component: LucideIcon;
     color: string;
-    fill: string;
   }
 > = {
-  heart: { component: Heart, color: "#EF4444", fill: "#a00909" },
-  water: { component: Droplet, color: "#3B82F6", fill: "#1e6ce8" },
+  heart: {
+    component: Heart,
+    color: Colors.primary,
+  },
+
+  water: {
+    component: Droplet,
+    color: "#4A90E2",
+  },
 };
 
-interface HealthMetricProp {
+interface HealthMetricProps {
   icon: string;
   label: string;
   value: string;
@@ -30,32 +34,30 @@ export default function HealthMetric({
   label,
   value,
   unit,
-}: HealthMetricProp) {
-  const iconConfig = Icon_Map[icon];
+}: HealthMetricProps) {
+  const iconConfig = ICON_MAP[icon];
   const IconComponent = iconConfig?.component;
+
   return (
     <View style={styles.container}>
       <View
         style={[
           styles.iconContainer,
-          { backgroundColor: `${iconConfig?.color}15` },
+          {
+            backgroundColor: iconConfig
+              ? `${iconConfig.color}15`
+              : Colors.surfaceSecondary,
+          },
         ]}
       >
-        {IconComponent ? (
-          <IconComponent
-            size={24}
-            color={iconConfig.color}
-            fill={iconConfig.fill}
-          />
-        ) : null}
+        {IconComponent && <IconComponent size={20} color={iconConfig.color} />}
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.label}>{label}</Text>
-        <View style={styles.valueRow}>
-          <Text style={styles.value}>{value}</Text>
-          <Text style={styles.unit}>{unit}</Text>
-        </View>
+      <Text style={styles.label}>{label}</Text>
+
+      <View style={styles.valueRow}>
+        <Text style={styles.value}>{value}</Text>
+        <Text style={styles.unit}>{unit}</Text>
       </View>
     </View>
   );
@@ -63,41 +65,43 @@ export default function HealthMetric({
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.sm,
-    flexDirection: "row",
-    alignItems: "center",
-    minWidth: 120,
+    flex: 1,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: Colors.white,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
 
-  content: {
-    gap: 2,
-  },
   iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 14,
   },
+
   label: {
     fontSize: 13,
     color: Colors.textSecondary,
-    fontWeight: "500",
-    textTransform: "capitalize",
   },
+
   valueRow: {
     flexDirection: "row",
     alignItems: "baseline",
-    gap: spacing.xs,
+    marginTop: 4,
   },
+
   value: {
-    fontSize: spacing.xl,
-    fontWeight: "bold",
+    fontSize: 23,
+    fontWeight: "800",
     color: Colors.text,
   },
-  unit: {
-    fontSize: spacing.md,
 
+  unit: {
+    marginLeft: spacing.xs,
+    fontSize: 12,
     color: Colors.textMuted,
   },
 });
