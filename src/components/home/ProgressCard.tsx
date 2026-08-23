@@ -1,5 +1,13 @@
 import { Colors } from "@/constants/theme";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 interface ProgressCardProps {
   percentage: number;
@@ -12,6 +20,28 @@ export default function ProgressCard({
   completed,
   total,
 }: ProgressCardProps) {
+  const progress = useSharedValue(0);
+  const [displayPercentage, setDisplayPercentage] = useState(0);
+
+  useEffect(() => {
+    progress.value = withTiming(percentage / 100, {
+      duration: 1000,
+    });
+  }, [percentage]);
+
+  useAnimatedReaction(
+    () => Math.round(progress.value * 100),
+    (current, previous) => {
+      if (current !== previous) {
+        runOnJS(setDisplayPercentage)(current);
+      }
+    },
+  );
+
+  const progressStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -26,15 +56,10 @@ export default function ProgressCard({
       </View>
 
       <View style={styles.progressSection}>
-        <Text style={styles.percentage}>{percentage}%</Text>
+        <Text style={styles.percentage}>{displayPercentage}%</Text>
 
         <View style={styles.progressTrack}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${Math.min(percentage, 100)}%` },
-            ]}
-          />
+          <Animated.View style={[styles.progressFill, progressStyle]} />
         </View>
 
         <Text style={styles.subtitle}>
