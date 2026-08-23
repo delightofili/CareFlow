@@ -4,6 +4,11 @@ import { Task } from "@/types";
 import { Check } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 interface TaskProps {
   task: Task;
@@ -11,15 +16,32 @@ interface TaskProps {
 
 export default function TaskCard({ task }: TaskProps) {
   const [completed, setCompleted] = useState(task.status === "completed");
+  const scale = useSharedValue(1);
 
+  const toggleTask = () => {
+    setCompleted((prev) => !prev);
+
+    scale.value = withSpring(1.15, {}, () => {
+      scale.value = withSpring(1);
+    });
+  };
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
   return (
     <Pressable
-      onPress={() => setCompleted((prev) => !prev)}
+      onPress={toggleTask}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <View style={[styles.checkbox, completed && styles.checkboxCompleted]}>
+      <Animated.View
+        style={[
+          styles.checkbox,
+          completed && styles.checkboxCompleted,
+          animatedStyle,
+        ]}
+      >
         {completed && <Check size={15} color={Colors.white} strokeWidth={3} />}
-      </View>
+      </Animated.View>
 
       <View style={styles.content}>
         <Text style={[styles.title, completed && styles.completedTitle]}>
@@ -30,7 +52,6 @@ export default function TaskCard({ task }: TaskProps) {
           {task.category} · {task.time}
         </Text>
       </View>
-
       <StatusBadge status={completed ? "completed" : "pending"} />
     </Pressable>
   );
@@ -38,6 +59,7 @@ export default function TaskCard({ task }: TaskProps) {
 
 const styles = StyleSheet.create({
   card: {
+    padding: 3,
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 16,
@@ -50,8 +72,8 @@ const styles = StyleSheet.create({
   },
 
   checkbox: {
-    width: 28,
-    height: 28,
+    width: 25,
+    height: 25,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: "#D4D4D4",

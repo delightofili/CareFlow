@@ -25,7 +25,7 @@ export default function ProgressCard({
 
   useEffect(() => {
     progress.value = withTiming(percentage / 100, {
-      duration: 1000,
+      duration: 2000,
     });
   }, [percentage]);
 
