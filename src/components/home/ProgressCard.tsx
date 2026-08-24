@@ -1,11 +1,12 @@
 import { Colors } from "@/constants/theme";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 
@@ -22,6 +23,7 @@ export default function ProgressCard({
 }: ProgressCardProps) {
   const progress = useSharedValue(0);
   const [displayPercentage, setDisplayPercentage] = useState(0);
+  const cardScale = useSharedValue(1);
 
   useEffect(() => {
     progress.value = withTiming(percentage / 100, {
@@ -38,35 +40,57 @@ export default function ProgressCard({
     },
   );
 
+  const reloadProgress = () => {
+    progress.value = withSequence(
+      withTiming(0, { duration: 300 }),
+      withTiming(percentage / 100, { duration: 2000 }),
+    );
+  };
+
   const progressStyle = useAnimatedStyle(() => ({
     width: `${progress.value * 100}%`,
   }));
 
+  const animateCardScale = useAnimatedStyle(() => ({
+    transform: [{ scale: cardScale.value }],
+  }));
+
   return (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.label}>TODAY'S PROGRESS</Text>
-          <Text style={styles.heading}>You're doing great.</Text>
+    <Animated.View style={animateCardScale}>
+      <Pressable
+        onPress={reloadProgress}
+        onPressIn={() => {
+          cardScale.value = withTiming(0.97, { duration: 100 });
+        }}
+        onPressOut={() => {
+          cardScale.value = withTiming(1, { duration: 100 });
+        }}
+        style={styles.card}
+      >
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.label}>TODAY'S PROGRESS</Text>
+            <Text style={styles.heading}>You're doing great.</Text>
+          </View>
+
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Today</Text>
+          </View>
         </View>
 
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>Today</Text>
+        <View style={styles.progressSection}>
+          <Text style={styles.percentage}>{displayPercentage}%</Text>
+
+          <View style={styles.progressTrack}>
+            <Animated.View style={[styles.progressFill, progressStyle]} />
+          </View>
+
+          <Text style={styles.subtitle}>
+            {completed} of {total} activities completed
+          </Text>
         </View>
-      </View>
-
-      <View style={styles.progressSection}>
-        <Text style={styles.percentage}>{displayPercentage}%</Text>
-
-        <View style={styles.progressTrack}>
-          <Animated.View style={[styles.progressFill, progressStyle]} />
-        </View>
-
-        <Text style={styles.subtitle}>
-          {completed} of {total} activities completed
-        </Text>
-      </View>
-    </View>
+      </Pressable>
+    </Animated.View>
   );
 }
 

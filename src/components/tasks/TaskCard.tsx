@@ -1,6 +1,7 @@
 import StatusBadge from "@/components/ui/StatusBadge";
 import { Colors } from "@/constants/theme";
 import { Task } from "@/types";
+import * as Haptics from "expo-haptics";
 import { Check } from "lucide-react-native";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -18,8 +19,16 @@ export default function TaskCard({ task }: TaskProps) {
   const [completed, setCompleted] = useState(task.status === "completed");
   const scale = useSharedValue(1);
 
-  const toggleTask = () => {
-    setCompleted((prev) => !prev);
+  const toggleTask = async () => {
+    const nextCompleted = !completed;
+
+    setCompleted(nextCompleted);
+
+    console.log("completed:", nextCompleted);
+
+    if (nextCompleted) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
 
     scale.value = withSpring(1.15, {}, () => {
       scale.value = withSpring(1);
