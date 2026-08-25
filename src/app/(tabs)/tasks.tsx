@@ -1,8 +1,8 @@
 import TaskCard from "@/components/tasks/TaskCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Colors } from "@/constants/theme";
+import { getData, saveData } from "@/services/storage";
 import { Task } from "@/types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,9 +36,9 @@ export default function TasksScreen() {
 
   const loadTask = async () => {
     try {
-      const storedTask = await AsyncStorage.getItem(STORAGE_KEY);
+      const storedTask = await getData<Task[]>(STORAGE_KEY);
       if (storedTask !== null) {
-        setTasks(JSON.parse(storedTask));
+        setTasks(storedTask);
       }
     } catch (error) {
       console.error("Failed to load tasks", error);
@@ -49,15 +49,7 @@ export default function TasksScreen() {
     loadTask();
   }, []);
 
-  const saveTasks = async (newTasks: Task[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newTasks));
-    } catch (error) {
-      console.error("Failed to save tasks", error);
-    }
-  };
-
-  const handleToggleTask = (id: string) => {
+  const handleToggleTask = async (id: string) => {
     const updatedTasks = tasks.map((t) => {
       if (t.id === id) {
         const nextStatus = t.status === "completed" ? "pending" : "completed";
@@ -66,7 +58,7 @@ export default function TasksScreen() {
       return t;
     });
     setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+    await saveData(STORAGE_KEY, updatedTasks);
   };
   return (
     <SafeAreaView style={styles.safeArea}>
