@@ -3,7 +3,6 @@ import { Colors } from "@/constants/theme";
 import { Task } from "@/types";
 import * as Haptics from "expo-haptics";
 import { Check } from "lucide-react-native";
-import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -13,20 +12,18 @@ import Animated, {
 
 interface TaskProps {
   task: Task;
+  onToggle: () => void;
 }
 
-export default function TaskCard({ task }: TaskProps) {
-  const [completed, setCompleted] = useState(task.status === "completed");
+export default function TaskCard({ task, onToggle }: TaskProps) {
+  const completed = task.status === "completed";
+
   const scale = useSharedValue(1);
 
   const toggleTask = async () => {
-    const nextCompleted = !completed;
+    onToggle();
 
-    setCompleted(nextCompleted);
-
-    console.log("completed:", nextCompleted);
-
-    if (nextCompleted) {
+    if (!completed) {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
