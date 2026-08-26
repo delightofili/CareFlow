@@ -1,6 +1,8 @@
 import TimelineItem from "@/components/timeline/TimelineItem";
+import Skeleton from "@/components/ui/Skeleton";
 import { Colors } from "@/constants/theme";
 import { TimelineEvent } from "@/types";
+import { useEffect, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,6 +31,15 @@ const TIMELINE_EVENTS: TimelineEvent[] = [
 ];
 
 export default function TimelineScreen() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -36,18 +47,75 @@ export default function TimelineScreen() {
 
         <Text style={styles.subtitle}>August 15</Text>
 
-        <FlatList
-          data={TIMELINE_EVENTS}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <TimelineItem
-              item={item}
-              isLast={index === TIMELINE_EVENTS.length - 1}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-        />
+        {loading ? (
+          <View style={styles.timelineSkeleton}>
+            <View
+              style={{
+                flex: 1,
+                gap: 3,
+                flexDirection: "row",
+              }}
+            >
+              <Skeleton width="20%" height={50} borderRadius={6} />
+              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
+                <Skeleton width="60%" height={16} borderRadius={6} />
+                <Skeleton width="80%" height={16} borderRadius={6} />
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                gap: 3,
+                flexDirection: "row",
+              }}
+            >
+              <Skeleton width="20%" height={50} borderRadius={6} />
+              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
+                <Skeleton width="60%" height={16} borderRadius={6} />
+                <Skeleton width="80%" height={16} borderRadius={6} />
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                gap: 3,
+                flexDirection: "row",
+              }}
+            >
+              <Skeleton width="20%" height={50} borderRadius={6} />
+              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
+                <Skeleton width="60%" height={16} borderRadius={6} />
+                <Skeleton width="80%" height={16} borderRadius={6} />
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 1,
+                gap: 3,
+                flexDirection: "row",
+              }}
+            >
+              <Skeleton width="20%" height={50} borderRadius={6} />
+              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
+                <Skeleton width="60%" height={16} borderRadius={6} />
+                <Skeleton width="80%" height={16} borderRadius={6} />
+              </View>
+            </View>
+          </View>
+        ) : (
+          <FlatList
+            data={TIMELINE_EVENTS}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item, index }) => (
+              <TimelineItem
+                item={item}
+                isLast={index === TIMELINE_EVENTS.length - 1}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -80,5 +148,13 @@ const styles = StyleSheet.create({
 
   list: {
     paddingBottom: 40,
+  },
+
+  timelineSkeleton: {
+    marginTop: 18,
+    padding: 14,
+    borderRadius: 24,
+    gap: 10,
+    backgroundColor: Colors.surface,
   },
 });

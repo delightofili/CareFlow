@@ -1,4 +1,5 @@
 import TaskCard from "@/components/tasks/TaskCard";
+import EmptyState from "@/components/ui/EmptyState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Colors } from "@/constants/theme";
 import { useCareFlow } from "@/context/CareFlowContext";
@@ -16,6 +17,13 @@ export default function TasksScreen() {
         <Text style={styles.subtitle}>Stay consistent with your health.</Text>
 
         <SectionHeader title="Today" />
+
+        {tasks.length === 0 && (
+          <EmptyState
+            title="You're all caught up!"
+            description="No tasks remaining for today."
+          />
+        )}
 
         <FlatList
           data={tasks}
