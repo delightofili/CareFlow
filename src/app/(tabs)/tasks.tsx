@@ -1,65 +1,13 @@
 import TaskCard from "@/components/tasks/TaskCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Colors } from "@/constants/theme";
-import { getData, saveData } from "@/services/storage";
-import { Task } from "@/types";
-import { useEffect, useState } from "react";
+import { useCareFlow } from "@/context/CareFlowContext";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const STORAGE_KEY = "tasks";
-
 export default function TasksScreen() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: "Take medication",
-      category: "Medication",
-      time: "8:00 AM",
-      status: "completed",
-    },
-    {
-      id: "2",
-      title: "Drink water",
-      category: "Wellness",
-      time: "10:00 AM",
-      status: "pending",
-    },
-    {
-      id: "3",
-      title: "20 minute walk",
-      category: "Exercise",
-      time: "4:00 PM",
-      status: "pending",
-    },
-  ]);
+  const { tasks, toggleTask } = useCareFlow();
 
-  const loadTask = async () => {
-    try {
-      const storedTask = await getData<Task[]>(STORAGE_KEY);
-      if (storedTask !== null) {
-        setTasks(storedTask);
-      }
-    } catch (error) {
-      console.error("Failed to load tasks", error);
-    }
-  };
-
-  useEffect(() => {
-    loadTask();
-  }, []);
-
-  const handleToggleTask = async (id: string) => {
-    const updatedTasks = tasks.map((t) => {
-      if (t.id === id) {
-        const nextStatus = t.status === "completed" ? "pending" : "completed";
-        return { ...t, status: nextStatus };
-      }
-      return t;
-    });
-    setTasks(updatedTasks);
-    await saveData(STORAGE_KEY, updatedTasks);
-  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -73,7 +21,7 @@ export default function TasksScreen() {
           data={tasks}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TaskCard task={item} onToggle={() => handleToggleTask(item.id)} />
+            <TaskCard task={item} onToggle={() => toggleTask(item.id)} />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
