@@ -44,63 +44,20 @@ export default function TimelineScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Health Timeline</Text>
-
         <Text style={styles.subtitle}>August 15</Text>
 
         {loading ? (
           <View style={styles.timelineSkeleton}>
-            <View
-              style={{
-                flex: 1,
-                gap: 3,
-                flexDirection: "row",
-              }}
-            >
-              <Skeleton width="20%" height={50} borderRadius={6} />
-              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
-                <Skeleton width="60%" height={16} borderRadius={6} />
-                <Skeleton width="80%" height={16} borderRadius={6} />
+            {[1, 2, 3, 4].map((key) => (
+              <View key={key} style={styles.skeletonRow}>
+                <Skeleton width={50} height={50} borderRadius={12} />
+
+                <View style={styles.skeletonContent}>
+                  <Skeleton width="55%" height={16} borderRadius={6} />
+                  <Skeleton width="80%" height={14} borderRadius={6} />
+                </View>
               </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                gap: 3,
-                flexDirection: "row",
-              }}
-            >
-              <Skeleton width="20%" height={50} borderRadius={6} />
-              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
-                <Skeleton width="60%" height={16} borderRadius={6} />
-                <Skeleton width="80%" height={16} borderRadius={6} />
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                gap: 3,
-                flexDirection: "row",
-              }}
-            >
-              <Skeleton width="20%" height={50} borderRadius={6} />
-              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
-                <Skeleton width="60%" height={16} borderRadius={6} />
-                <Skeleton width="80%" height={16} borderRadius={6} />
-              </View>
-            </View>
-            <View
-              style={{
-                flex: 1,
-                gap: 3,
-                flexDirection: "row",
-              }}
-            >
-              <Skeleton width="20%" height={50} borderRadius={6} />
-              <View style={{ flex: 1, gap: 4, flexDirection: "column" }}>
-                <Skeleton width="60%" height={16} borderRadius={6} />
-                <Skeleton width="80%" height={16} borderRadius={6} />
-              </View>
-            </View>
+            ))}
           </View>
         ) : (
           <FlatList
@@ -126,35 +83,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-
   container: {
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 20,
   },
-
   title: {
     fontSize: 30,
     fontWeight: "800",
     color: Colors.text,
   },
-
   subtitle: {
     marginTop: 6,
     marginBottom: 28,
     fontSize: 14,
     color: Colors.textSecondary,
   },
-
   list: {
     paddingBottom: 40,
   },
-
   timelineSkeleton: {
     marginTop: 18,
-    padding: 14,
+    padding: 16,
     borderRadius: 24,
-    gap: 10,
+    gap: 20,
     backgroundColor: Colors.surface,
+  },
+  skeletonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  skeletonContent: {
+    flex: 1,
+    gap: 8,
   },
 });

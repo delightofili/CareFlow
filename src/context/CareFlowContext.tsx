@@ -31,6 +31,8 @@ const INITIAL_TASKS: Task[] = [
 interface CareFlowContextType {
   tasks: Task[];
   toggleTask: (id: string) => void;
+  addTask: (task: Omit<Task, "id" | "status">) => void;
+  deleteTask: (id: string) => void;
 }
 
 const CareFlowContext = createContext<CareFlowContextType | null>(null);
@@ -63,8 +65,28 @@ export function CareFlowProvider({ children }: { children: React.ReactNode }) {
     await saveData(STORAGE_KEY, updatedTasks);
   };
 
+  const addTask = async (newTaskData: Omit<Task, "id" | "status">) => {
+    const newTask: Task = {
+      ...newTaskData,
+      id: Date.now().toString(),
+      status: "pending",
+    };
+
+    const updatedTasks = [newTask, ...tasks];
+    setTasks(updatedTasks);
+    await saveData(STORAGE_KEY, updatedTasks);
+  };
+
+  const deleteTask = async (id: string) => {
+    const updatedTasks = tasks.filter((t) => t.id !== id);
+    setTasks(updatedTasks);
+    await saveData(STORAGE_KEY, updatedTasks);
+  };
+
   return (
-    <CareFlowContext.Provider value={{ tasks, toggleTask }}>
+    <CareFlowContext.Provider
+      value={{ tasks, toggleTask, addTask, deleteTask }}
+    >
       {children}
     </CareFlowContext.Provider>
   );

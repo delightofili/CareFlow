@@ -3,7 +3,7 @@ import { Colors } from "@/constants/theme";
 import { Task } from "@/types";
 import * as Haptics from "expo-haptics";
 import { Check } from "lucide-react-native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -13,9 +13,10 @@ import Animated, {
 interface TaskProps {
   task: Task;
   onToggle: () => void;
+  onDelete: () => void;
 }
 
-export default function TaskCard({ task, onToggle }: TaskProps) {
+export default function TaskCard({ task, onToggle, onDelete }: TaskProps) {
   const completed = task.status === "completed";
 
   const scale = useSharedValue(1);
@@ -34,9 +35,21 @@ export default function TaskCard({ task, onToggle }: TaskProps) {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
+
+  const handleLongPress = () => {
+    Alert.alert(
+      "Delete Task",
+      `Are you sure you want to delete "${task.title}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: onDelete },
+      ],
+    );
+  };
   return (
     <Pressable
       onPress={toggleTask}
+      onLongPress={handleLongPress}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <Animated.View

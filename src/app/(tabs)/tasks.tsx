@@ -3,11 +3,12 @@ import EmptyState from "@/components/ui/EmptyState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { Colors } from "@/constants/theme";
 import { useCareFlow } from "@/context/CareFlowContext";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TasksScreen() {
-  const { tasks, toggleTask } = useCareFlow();
+  const { tasks, toggleTask, deleteTask } = useCareFlow();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -16,7 +17,13 @@ export default function TasksScreen() {
 
         <Text style={styles.subtitle}>Stay consistent with your health.</Text>
 
-        <SectionHeader title="Today" />
+        <View style={styles.heading}>
+          <SectionHeader title="Today" />
+
+          <Pressable onPress={() => router.push("/add-task")}>
+            <Text style={styles.button}>+ Add Task</Text>
+          </Pressable>
+        </View>
 
         {tasks.length === 0 && (
           <EmptyState
@@ -29,7 +36,11 @@ export default function TasksScreen() {
           data={tasks}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TaskCard task={item} onToggle={() => toggleTask(item.id)} />
+            <TaskCard
+              task={item}
+              onToggle={() => toggleTask(item.id)}
+              onDelete={() => deleteTask(item.id)}
+            />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.list}
@@ -65,5 +76,21 @@ const styles = StyleSheet.create({
 
   list: {
     paddingBottom: 40,
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    padding: 8,
+    alignItems: "center",
+    borderRadius: 16,
+    color: Colors.white,
+    fontSize: 12,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  heading: {
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });
