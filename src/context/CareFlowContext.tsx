@@ -1,91 +1,196 @@
-import { getData, saveData } from "@/services/storage";
-import { Task } from "@/types";
-import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { Appointment, HealthMeasurement, Task } from "@/types";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useAuth } from "./AuthContext";
 
 const STORAGE_KEY = "tasks";
 
-const INITIAL_TASKS: Task[] = [
-  {
-    id: "1",
-    title: "Take medication",
-    category: "Medication",
-    time: "8:00 AM",
-    status: "completed",
-  },
-  {
-    id: "2",
-    title: "Drink water",
-    category: "Wellness",
-    time: "10:00 AM",
-    status: "pending",
-  },
-  {
-    id: "3",
-    title: "20 minute walk",
-    category: "Exercise",
-    time: "4:00 PM",
-    status: "pending",
-  },
-];
-
 interface CareFlowContextType {
   tasks: Task[];
-  toggleTask: (id: string) => void;
-  addTask: (task: Omit<Task, "id" | "status">) => void;
-  deleteTask: (id: string) => void;
+  appointments: Appointment[];
+  latestHeartRate: HealthMeasurement | null;
+  loading: boolean;
+  fetchTasks: () => Promise<void>;
+  toggleTaskStatus: (taskId: string, currentStatus: string) => Promise<void>;
+  //addTask: (task: Omit<Task, "id" | "status">) => void;
+  addTask: (
+    title: string,
+    category: string,
+    dueTime: string,
+  ) => Promise<{ error: any }>;
+  deleteTask: (taskId: string) => void;
+  fetchAppointments: () => Promise<void>;
+  addAppointment: (
+    title: string,
+    doctorName: string,
+    location: string,
+    scheduledAt: string,
+  ) => Promise<{ error: any }>;
+  recordHealthMeasurement: (
+    type: string,
+    valueu: number,
+    unit: string,
+  ) => Promise<{ error: any }>;
 }
 
 const CareFlowContext = createContext<CareFlowContextType | null>(null);
 
 export function CareFlowProvider({ children }: { children: React.ReactNode }) {
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
-  useEffect(() => {
-    async function loadInitialTasks() {
-      try {
-        const storedTasks = await getData<Task[]>(STORAGE_KEY);
-        if (storedTasks !== null) {
-          setTasks(storedTasks);
-        }
-      } catch (error) {
-        console.error("Failed to load tasks", error);
-      }
-    }
-    loadInitialTasks();
-  }, []);
-  const toggleTask = async (id: string) => {
-    const updatedTasks = tasks.map((t) => {
-      if (t.id === id) {
-        const nextStatus = t.status === "completed" ? "pending" : "completed";
-        return { ...t, status: nextStatus };
-      }
-      return t;
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [latestHeartRate, setLatestHeartRate] =
+    useState<HealthMeasurement | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchTasks = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) setTasks(data);
+  }, [user]);
+
+  const toggleTaskStatus = async (taskId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "completed" ? "pending" : "completed";
+
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
+    );
+
+    const { error } = await supabase
+      .from("tasks")
+      .update({ status: newStatus })
+      .eq("id", taskId);
+
+    if (error) fetchTasks();
+  };
+
+  const addTask = async (title: string, category: string, dueTime: string) => {
+    if (!user) return { error: "No authenticated user" };
+    const { error } = await supabase.from("tasks").insert({
+      user_id: user.id,
+      title,
+      category,
+      due_time: dueTime,
+      status: "pending",
     });
 
-    setTasks(updatedTasks);
-    await saveData(STORAGE_KEY, updatedTasks);
+    if (!error) await fetchTasks();
+    return { error };
   };
 
-  const addTask = async (newTaskData: Omit<Task, "id" | "status">) => {
-    const newTask: Task = {
-      ...newTaskData,
-      id: Date.now().toString(),
-      status: "pending",
-    };
+  const deleteTask = async (taskId: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
-    const updatedTasks = [newTask, ...tasks];
-    setTasks(updatedTasks);
-    await saveData(STORAGE_KEY, updatedTasks);
+    if (error) {
+      console.error("Failed to delete task:", error.message);
+    }
   };
 
-  const deleteTask = async (id: string) => {
-    const updatedTasks = tasks.filter((t) => t.id !== id);
-    setTasks(updatedTasks);
-    await saveData(STORAGE_KEY, updatedTasks);
+  const fetchAppointments = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("appointments")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("scheduled_at", { ascending: true });
+
+    if (!error && data) setAppointments(data);
+  }, [user]);
+
+  const addAppointment = async (
+    title: string,
+    doctorName: string,
+    location: string,
+    scheduledAt: string,
+  ) => {
+    if (!user) return { error: "No authenticated user" };
+
+    const { error } = await supabase.from("appointments").insert({
+      user_id: user.id,
+      title,
+      doctor_name: doctorName,
+      location,
+      scheduled_at: scheduledAt,
+    });
+
+    if (!error) await fetchAppointments();
+    return { error };
   };
+
+  const fetchLatestHeartRate = useCallback(async () => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("health_measurements")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("type", "heart_rate")
+      .order("recorded_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!error && data) setLatestHeartRate(data);
+  }, [user]);
+
+  const recordHealthMeasurement = async (
+    type: string,
+    value: number,
+    unit: string,
+  ) => {
+    if (!user) return { error: "No authenticated user" };
+
+    const { error } = await supabase.from("health_measurements").insert({
+      user_id: user.id,
+      type,
+      value,
+      unit,
+    });
+
+    if (!error && type === "heart_rate") await fetchLatestHeartRate();
+    return { error };
+  };
+
+  useEffect(() => {
+    if (user) {
+      setLoading(true);
+      Promise.all([
+        fetchTasks(),
+        fetchAppointments(),
+        fetchLatestHeartRate(),
+      ]).finally(() => setLoading(false));
+    } else {
+      setTasks([]);
+      setAppointments([]);
+      setLatestHeartRate(null);
+    }
+  }, [user, fetchTasks, fetchAppointments, fetchLatestHeartRate]);
 
   return (
     <CareFlowContext.Provider
-      value={{ tasks, toggleTask, addTask, deleteTask }}
+      value={{
+        tasks,
+        fetchTasks,
+        toggleTaskStatus,
+        addTask,
+        deleteTask,
+        appointments,
+        fetchAppointments,
+        addAppointment,
+        latestHeartRate,
+        loading,
+        recordHealthMeasurement,
+      }}
     >
       {children}
     </CareFlowContext.Provider>

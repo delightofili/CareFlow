@@ -53,6 +53,10 @@ function InitialLayout() {
       <Stack.Screen name="login" />
       <Stack.Screen name="signup" />
       <Stack.Screen name="add-task" options={{ presentation: "modal" }} />
+      <Stack.Screen
+        name="record-health"
+        options={{ presentation: "modal", title: "Record Health" }}
+      />
     </Stack>
   );
 }
@@ -68,11 +72,6 @@ export default function RootLayout() {
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
             <InitialLayout />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-              }}
-            />
           </ThemeProvider>
         </CareFlowProvider>
       </AuthProvider>
